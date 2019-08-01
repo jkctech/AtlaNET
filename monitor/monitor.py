@@ -2,9 +2,7 @@
 
 # AtlaNET P2000 Receiver - By: JKCTech
 # Inspired by: https://nl.oneguyoneblog.com/2016/08/09/p2000-ontvangen-decoderen-raspberry-pi/
-#
-# Changelog:
-# 31-07-2019 -> Initial creation / adaptation of original
+# Follow up on a tutorial setting up the FLEX radio: https://raspberrytips.nl/p2000-meldingen-ontvangen/
 
 import time
 import sys
@@ -12,14 +10,27 @@ import subprocess
 import os
 import re
 import fcntl
+import requests
+import json
 from datetime import datetime
 from dateutil import tz
 from termcolor import colored
 
-# Settings
-command = "rtl_fm -f 169.65M -M fm -s 22050 | multimon-ng -q -a FLEX -t raw /dev/stdin" # Command to use for the radio
-triggertime = 0.03 # After nothing read for time, assume messagroup has ended
-#errfile = os.path.abspath(os.path.dirname(__file__)) + "/error.log"
+# Config File options
+config_file = os.path.abspath(os.path.dirname(__file__)) + "/config/config.json"
+config_file_default = os.path.abspath(os.path.dirname(__file__)) + "/config/config_default.json"
+
+# Fallback to default if needed
+if not os.path.exists(config_file) or not os.path.isfile(config_file):
+	config_file = config_file_default
+
+# Try reading the config file
+try:
+	with open(config_file) as json_data_file:
+		settings = json.load(json_data_file)
+except:
+	print colored('Could not load in config file.', 'red')
+	sys.exit()
 
 # Variables
 run = True			# Do we want to continue for another cycle? (Used to interrupt).
@@ -37,12 +48,8 @@ regex_prio1 = "^A\s?1|\s?A\s?1|PRIO\s?1|^P\s?1"
 regex_prio2 = "^A\s?2|\s?A\s?2|PRIO\s?2|^P\s?2"
 regex_prio3 = "^B\s?1|^B\s?2|^B\s?3|PRIO\s?3|^P\s?3|PRIO\s?4|^P\s?4"
 
-#with open(errfile,'a') as file:
-#    file.write(('#' * 20) + '\n' + (time.strftime("%H:%M:%S %Y-%m-%d")) + '\n')
-
 # Open a subprocess and listen to the radio
-#multimon_ng = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=open(errfile,'a'), shell=True)
-multimon_ng = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=open(os.devnull, 'w'), shell=True)
+multimon_ng = subprocess.Popen(settings['radio']['command'], stdout=subprocess.PIPE, stderr=open(os.devnull, 'w'), shell=True)
 
 # Make subprocess non-blocking so we can keep track of other stuff while nothing is happening
 fcntl.fcntl(multimon_ng.stdout.fileno(), fcntl.F_SETFL, os.O_NONBLOCK)
@@ -66,13 +73,30 @@ try:
 		try:
 			line = multimon_ng.stdout.readline()
 
-		# Nothing to read...
+		# Nothing to read... Is this the end?
 		except:
 			# If we are reading a group and nothing seen for X time, assume ending
-			# And send information to server
-			if reading == True and time.time() - lastread > triggertime:
+			if reading == True and time.time() - lastread > settings['radio']['triggertime']:
+				# Send to server with a POST
 				print colored('\nAtlaNET:', 'cyan'),
-				print colored('Acknowledged.', 'green')
+				try:
+					r = requests.post(settings['api']['endpoint'], data={
+						'key': settings['api']['key'], 
+						'action': 'insert', 
+						'timestamp': timestamp, 
+						'message': message, 
+						'capcodes': ','.join(capcodes)
+					})
+				except:
+					print colored('FAILED!', 'red'),
+					print colored('Could not connect to endpoint.', 'magenta')
+				else:
+					if r.status_code == 200:
+						print colored(r.reason, 'green'),
+						print colored(r.text, 'white')
+					else:
+						print colored(r.status_code, 'red'),
+						print colored(r.reason, 'magenta')
 				reading = False
 				continue
 		
@@ -125,7 +149,7 @@ try:
 					#capcodes.append(capcode)
 					groupidold = groupid
 
-# KEyboard Interrupt (Ctrl + C)
+# Keyboard Interrupt (Ctrl + C)
 except KeyboardInterrupt:
 	os.kill(multimon_ng.pid, 9)
 	print colored('\nListener terminated by user.', 'red')
