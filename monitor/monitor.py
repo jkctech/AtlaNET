@@ -1,8 +1,14 @@
 #!/usr/bin/python
 
+#
+# Monitor.py
+#
 # AtlaNET P2000 Receiver - By: JKCTech
+# https://github.com/jkctech/AtlaNET
+# 
 # Inspired by: https://nl.oneguyoneblog.com/2016/08/09/p2000-ontvangen-decoderen-raspberry-pi/
 # Follow up on a tutorial setting up the FLEX radio: https://raspberrytips.nl/p2000-meldingen-ontvangen/
+#
 
 import time
 import sys
@@ -77,26 +83,29 @@ try:
 		except:
 			# If we are reading a group and nothing seen for X time, assume ending
 			if reading == True and time.time() - lastread > settings['radio']['triggertime']:
+				if settings['common']['debug']:
+					print colored('\nAtlaNET:', 'cyan'),
+
 				# Send to server with a POST
-				print colored('\nAtlaNET:', 'cyan'),
 				try:
 					r = requests.post(settings['api']['endpoint'], data={
-						'key': settings['api']['key'], 
-						'action': 'insert', 
+						'apikey': settings['api']['key'],
 						'timestamp': timestamp, 
 						'message': message, 
 						'capcodes': ','.join(capcodes)
 					})
 				except:
-					print colored('FAILED!', 'red'),
-					print colored('Could not connect to endpoint.', 'magenta')
+					if settings['common']['debug']:
+						print colored('FAILED!', 'red'),
+						print colored('Could not reach endpoint.', 'magenta')
 				else:
-					if r.status_code == 200:
-						print colored(r.reason, 'green'),
-						print colored(r.text, 'white')
-					else:
-						print colored(r.status_code, 'red'),
-						print colored(r.reason, 'magenta')
+					if settings['common']['debug']:
+						if r.status_code == 200:
+							print colored(r.reason, 'green'),
+							print colored(r.text, 'green')
+						else:
+							print colored(r.status_code, 'red'),
+							print colored(r.reason, 'magenta')
 				reading = False
 				continue
 		
