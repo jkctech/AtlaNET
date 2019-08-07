@@ -9,6 +9,11 @@ This project is based on a tutorial on setting-up the RPI FLEX radio found [here
 ![Example](https://jkctech.nl/projects/atlan/cdn/github/example.jpg)
 
 ### Changelog:
+08-08-2019
+ - Minor changes to the monitor script
+ - Introduction of the filter script (will replace parts of the code in monitor.py)
+ - Preparations for planned features including logging, caching and saving.
+
 01-08-2019
  - Renamed p2000.py > monitor.py
  - Added config files (Rename config_default.json to config.json for proper usage)
