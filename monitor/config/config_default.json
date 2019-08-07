@@ -1,6 +1,7 @@
 {
 	"common":{
 		"debug": false,
+		"saveraw": false,
 		"onerror": ""
 	},
     "radio":{
