@@ -39,7 +39,6 @@ except:
 	sys.exit()
 
 # Variables
-run = True			# Do we want to continue for another cycle? (Used to interrupt).
 reading = False		# Are we reading a messagegroup?
 groupidold = ""		# Last GroupID to compare to see if we entered a new message.
 lastread = 0		# Time of last message reading.
@@ -66,14 +65,13 @@ print colored(multimon_ng.pid, 'cyan')
 
 try:
 	# We wanna run another cycle?
-    while run:
+    while True:
 		line = ''
 
 		# If radio is NOT available
 		if multimon_ng.poll() != None:
 			print colored('Radio not connected or already in use.', 'red')
-			run = False
-			continue
+			break
 
 		# Readline from radio
 		try:
@@ -102,7 +100,7 @@ try:
 					if settings['common']['debug']:
 						if r.status_code == 200:
 							print colored(r.reason, 'green'),
-							print colored(r.text, 'green')
+							print colored(r.text, 'cyan')
 						else:
 							print colored(r.status_code, 'red'),
 							print colored(r.reason, 'magenta')
