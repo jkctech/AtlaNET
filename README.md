@@ -10,7 +10,7 @@ This project is based on a tutorial on setting-up the RPI FLEX radio found [here
 
 ### Changelog:
 18-08-2019
- - Added test to speach controller
+ - Added text to speach (TTS) controller
 
 08-08-2019
  - Minor changes to the monitor script
