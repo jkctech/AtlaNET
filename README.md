@@ -9,6 +9,9 @@ This project is based on a tutorial on setting-up the RPI FLEX radio found [here
 ![Example](https://jkctech.nl/projects/atlan/cdn/github/example.jpg)
 
 ### Changelog:
+18-08-2019
+ - Added test to speach controller
+
 08-08-2019
  - Minor changes to the monitor script
  - Introduction of the filter script (will replace parts of the code in monitor.py)
