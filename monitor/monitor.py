@@ -21,6 +21,13 @@ import json
 from datetime import datetime
 from dateutil import tz
 from termcolor import colored
+import time
+import pyttsx3
+import pygame
+
+# Import our own utils
+import utils.filter
+import utils.resolver
 
 # Config File options
 config_file = os.path.abspath(os.path.dirname(__file__)) + "/config/config.json"
@@ -63,6 +70,23 @@ fcntl.fcntl(multimon_ng.stdout.fileno(), fcntl.F_SETFL, os.O_NONBLOCK)
 print 'Started listener with PID:',
 print colored(multimon_ng.pid, 'cyan')
 
+def alert(message, count = 2, volume = 1):
+	for x in range(count):
+		pygame.mixer.init()
+		pygame.mixer.music.load("assets/siren.wav")
+		pygame.mixer.music.set_volume(0.07 * volume)
+		pygame.mixer.music.play()
+		while pygame.mixer.music.get_busy() == True:
+			continue
+		time.sleep(0.5)
+		engine = pyttsx3.init()
+		engine.setProperty('voice', 'dutch')
+		engine.setProperty('volume', 1 * volume)
+		engine.setProperty('rate', 150)
+		engine.say(message)
+		engine.runAndWait()
+		time.sleep(0.5)
+
 try:
 	# We wanna run another cycle?
     while True:
@@ -81,6 +105,11 @@ try:
 		except:
 			# If we are reading a group and nothing seen for X time, assume ending
 			if reading == True and time.time() - lastread > settings['radio']['triggertime']:
+				# Save raw if wanted
+				if settings['common']['saverawunique']:
+					with open(os.path.abspath(os.path.dirname(__file__)) + "/logs/unique.txt", 'a') as file:
+						file.write(line)
+
 				if settings['common']['debug']:
 					print colored('\nAtlaNET:', 'cyan'),
 
@@ -105,11 +134,19 @@ try:
 							print colored(r.status_code, 'red'),
 							print colored(r.reason, 'magenta')
 				reading = False
+				# Check if we need voice
+				if message.lower().__contains__("den helder"):
+					alert(message)
 				continue
 		
 		finally:
-			# If it's sure to be a P2000 message
+			# Start of a new P2000 message
 			if line.__contains__("ALN") and line.startswith('FLEX'):
+				# Save raw if wanted
+				if settings['common']['saveraw']:
+					with open(os.path.abspath(os.path.dirname(__file__)) + "/logs/raw.txt", 'a') as file:
+						file.write(line)
+
 				# Substring the needed parts (DIFFERENT FROM ORIGINAL)
 				timestamp = line[6:25]
 				groupid = line[37:43]

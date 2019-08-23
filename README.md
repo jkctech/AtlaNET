@@ -9,6 +9,11 @@ This project is based on a tutorial on setting-up the RPI FLEX radio found [here
 ![Example](https://jkctech.nl/projects/atlan/cdn/github/example.jpg)
 
 ### Changelog:
+23-08-2019
+ - Fixed speaker speed
+ - Added quick debug speaker to custom need
+ - Added 2 quick ways to save data to a log file
+
 18-08-2019
  - Added text to speach (TTS) controller
 

@@ -18,15 +18,15 @@ def getPrio(msg):
 	if re.search("((^|\s)(test(oproep)?|proefalarm)|The quick brown fox jumps)", msg, re.IGNORECASE):
 		return 5
 
-	# A prio's [1 - 5]
-	for i in range(1,6):
-		if re.search("(^|\s)(A\s?%d|P(RIO)?\s?%d|^P\s?%d)" % (i,i,i), msg, re.IGNORECASE):
+	# A prio's [1 - 4]
+	for i in range(1,5):
+		if re.search("(^A\s?%d|P(RIO)?\s?%d)" % (i,i), msg, re.IGNORECASE):
 			return i
 
 	# B prio's [1 - 3]
 	for i in range(1,4):
 		if re.search("(^|\s)B\s?%d" % (i), msg, re.IGNORECASE):
-			return -i
+			return i + 9
 
 	return 0
 
@@ -35,11 +35,12 @@ def isRevoke(msg):
 	return bool(re.search("intrekken", msg, re.IGNORECASE))
 
 # TRY to find out the dicipline of the call
-def getDicipline(msg):
+#def getDicipline(capcodes, msg):
 
-# TEST RUNNER
+'''
 print "Prio\tRevoke\tMessage"
 
 with open('../testdata/flex_clean.txt','r') as f:
 	for x in f.readlines():
 		print "%d\t%d\t%s" % (getPrio(x), int(isRevoke(x)), x),
+'''
