@@ -2,7 +2,11 @@
 	"common":{
 		"debug": true,
 		"saveraw": false,
+		"rawdatefiles": true,
+		"rawpath": "/../logs/raw/",
 		"saverawunique": false,
+		"uniquepath": "/../logs/unique/",
+		"uniquedatefiles": true,
 		"onerror": ""
 	},
     "radio":{
