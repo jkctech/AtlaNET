@@ -9,6 +9,12 @@ This project is based on a tutorial on setting-up the RPI FLEX radio found [here
 ![Example](https://jkctech.nl/projects/atlan/cdn/github/example.jpg)
 
 ### Changelog:
+26-08-2019
+ - Added logging of raw messages and unique messages
+ - Added ascii art header file
+ - Added shortcut scripts for infrastructure
+ - Minor logic fixes and changes
+
 23-08-2019
  - Fixed speaker speed
  - Added quick debug speaker to custom need
