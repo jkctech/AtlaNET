@@ -18,10 +18,12 @@ import re
 import fcntl
 import requests
 import json
+import mysql.connector
 from datetime import datetime, date
 from dateutil import tz
 from termcolor import colored
 
+# Import our own stuff <3
 from utils.logger import *
 from utils.header import *
 from utils.alerter import *
@@ -47,6 +49,44 @@ try:
 except:
 	print colored('Could not load in config file.', 'red')
 	sys.exit()
+
+# Connect to database
+con = None
+if settings['mysql']['enabled']:
+	print 'Database Connection:',
+	try:
+		con = mysql.connector.connect(
+			host=settings['mysql']['host'],
+			user=settings['mysql']['username'],
+			passwd=settings['mysql']['password'],
+			database=settings['mysql']['database']
+		)
+		print colored('SUCCESS', 'green')
+	except Exception as e:
+		print colored('ERROR', 'red')
+		print colored(e, 'red')
+		exit()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+exit()
+
 
 # Variables
 reading = False		# Are we reading a messagegroup?
@@ -177,13 +217,15 @@ try:
 
 # Keyboard Interrupt (Ctrl + C)
 except KeyboardInterrupt:
-	#os.kill(multimon_ng.pid, 9)
-	multimon_ng.kill()
-	print colored('\nListener terminated by user.', 'red')
+	print colored('\nTerminated by user.', 'red')
 
 # Catch crashes
 except (Exception) as e:
-	#os.kill(multimon_ng.pid, 9)
-	multimon_ng.kill()
-	print colored('\nException catched:', 'red')
+	print colored('\nException:', 'red')
 	print e
+
+# Cleanup
+finally:
+	multimon_ng.kill()
+	if con not is None
+		con.close()

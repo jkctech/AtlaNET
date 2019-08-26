@@ -14,6 +14,7 @@ This project is based on a tutorial on setting-up the RPI FLEX radio found [here
  - Added ascii art header file
  - Added shortcut scripts for infrastructure
  - Minor logic fixes and changes
+ - Added MySQL connector
 
 23-08-2019
  - Fixed speaker speed

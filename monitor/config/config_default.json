@@ -19,5 +19,12 @@
 	},
 	"locationiq":{
 		"key": ""
+	},
+	"mysql":{
+		"enabled":true,
+		"host":"localhost",
+		"username":"root",
+		"password":"",
+		"database":"atlanet"
 	}
 }
