@@ -5,29 +5,32 @@
 #
 # AtlaNET P2000 Receiver - By: JKCTech
 # https://github.com/jkctech/AtlaNET
-# 
+#
 # Inspired by: https://nl.oneguyoneblog.com/2016/08/09/p2000-ontvangen-decoderen-raspberry-pi/
 # Follow up on a tutorial setting up the FLEX radio: https://raspberrytips.nl/p2000-meldingen-ontvangen/
 #
 
+import os
 import time
 import sys
 import subprocess
-import os
 import re
 import fcntl
 import requests
 import json
-from datetime import datetime
+from datetime import datetime, date
 from dateutil import tz
 from termcolor import colored
-import time
-import pyttsx3
-import pygame
 
-# Import our own utils
-import utils.filter
-import utils.resolver
+from utils.logger import *
+from utils.header import *
+from utils.alerter import *
+
+# Disable pygame's "hello" message
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+
+# Print header design
+printheader()
 
 # Config File options
 config_file = os.path.abspath(os.path.dirname(__file__)) + "/config/config.json"
@@ -70,23 +73,6 @@ fcntl.fcntl(multimon_ng.stdout.fileno(), fcntl.F_SETFL, os.O_NONBLOCK)
 print 'Started listener with PID:',
 print colored(multimon_ng.pid, 'cyan')
 
-def alert(message, count = 2, volume = 1):
-	for x in range(count):
-		pygame.mixer.init()
-		pygame.mixer.music.load("assets/siren.wav")
-		pygame.mixer.music.set_volume(0.07 * volume)
-		pygame.mixer.music.play()
-		while pygame.mixer.music.get_busy() == True:
-			continue
-		time.sleep(0.5)
-		engine = pyttsx3.init()
-		engine.setProperty('voice', 'dutch')
-		engine.setProperty('volume', 1 * volume)
-		engine.setProperty('rate', 150)
-		engine.say(message)
-		engine.runAndWait()
-		time.sleep(0.5)
-
 try:
 	# We wanna run another cycle?
     while True:
@@ -94,7 +80,7 @@ try:
 
 		# If radio is NOT available
 		if multimon_ng.poll() != None:
-			print colored('Radio not connected or already in use.', 'red')
+			print colored('Cannot claim radio thread. (Already in use?)', 'red')
 			break
 
 		# Readline from radio
@@ -106,9 +92,7 @@ try:
 			# If we are reading a group and nothing seen for X time, assume ending
 			if reading == True and time.time() - lastread > settings['radio']['triggertime']:
 				# Save raw if wanted
-				if settings['common']['saverawunique']:
-					with open(os.path.abspath(os.path.dirname(__file__)) + "/logs/unique.txt", 'a') as file:
-						file.write(line)
+				saverawunique(message, settings)
 
 				if settings['common']['debug']:
 					print colored('\nAtlaNET:', 'cyan'),
@@ -143,9 +127,7 @@ try:
 			# Start of a new P2000 message
 			if line.__contains__("ALN") and line.startswith('FLEX'):
 				# Save raw if wanted
-				if settings['common']['saveraw']:
-					with open(os.path.abspath(os.path.dirname(__file__)) + "/logs/raw.txt", 'a') as file:
-						file.write(line)
+				saveraw(line, settings)
 
 				# Substring the needed parts (DIFFERENT FROM ORIGINAL)
 				timestamp = line[6:25]
@@ -195,5 +177,13 @@ try:
 
 # Keyboard Interrupt (Ctrl + C)
 except KeyboardInterrupt:
-	os.kill(multimon_ng.pid, 9)
+	#os.kill(multimon_ng.pid, 9)
+	multimon_ng.kill()
 	print colored('\nListener terminated by user.', 'red')
+
+# Catch crashes
+except (Exception) as e:
+	#os.kill(multimon_ng.pid, 9)
+	multimon_ng.kill()
+	print colored('\nException catched:', 'red')
+	print e
