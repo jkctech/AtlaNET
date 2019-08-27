@@ -67,27 +67,6 @@ if settings['mysql']['enabled']:
 		print colored(e, 'red')
 		exit()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-exit()
-
-
 # Variables
 reading = False		# Are we reading a messagegroup?
 groupidold = ""		# Last GroupID to compare to see if we entered a new message.
@@ -227,5 +206,5 @@ except (Exception) as e:
 # Cleanup
 finally:
 	multimon_ng.kill()
-	if con not is None
+	if con:
 		con.close()
