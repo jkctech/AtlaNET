@@ -2,8 +2,12 @@ import os
 import pyttsx3
 import pygame
 import time
+import serial
 
-def alert(message, count = 2, volume = 1):
+def alert(message, settings, count = 2, volume = 1):
+	ser = serial.Serial(settings['serial']['port'], settings['serial']['baudrate'])
+	time.sleep(2)
+	ser.write('+')
 	for x in range(count):
 		pygame.mixer.init()
 		pygame.mixer.music.load(os.path.dirname(__file__) + "/../assets/siren.wav")
@@ -15,7 +19,8 @@ def alert(message, count = 2, volume = 1):
 		engine = pyttsx3.init()
 		engine.setProperty('voice', 'dutch')
 		engine.setProperty('volume', 1 * volume)
-		engine.setProperty('rate', 150)
+		engine.setProperty('rate', 160)
 		engine.say(message)
 		engine.runAndWait()
 		time.sleep(0.5)
+	ser.write('-')

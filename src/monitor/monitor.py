@@ -139,7 +139,7 @@ try:
 				reading = False
 				# Check if we need voice
 				if message.lower().__contains__("den helder"):
-					alert(message)
+					alert(message, settings)
 				continue
 		
 		finally:

@@ -26,5 +26,9 @@
 		"username":"root",
 		"password":"",
 		"database":"atlanet"
+	},
+	"serial":{
+		"port":"/dev/ttyUSB0",
+		"baudrate":9600
 	}
 }
