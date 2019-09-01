@@ -15,7 +15,7 @@ import re
 # Return the priority of the alert
 def getPrio(msg):
 	# Tests
-	if re.search("((^|\s)(test(oproep)?|proefalarm)|The quick brown fox jumps)", msg, re.IGNORECASE):
+	if re.search("((^test(oproep)?|proefalarm)|^The quick brown fox jumps)", msg, re.IGNORECASE):
 		return 5
 
 	# A prio's [1 - 4]
@@ -34,13 +34,8 @@ def getPrio(msg):
 def isRevoke(msg):
 	return bool(re.search("intrekken", msg, re.IGNORECASE))
 
-# TRY to find out the dicipline of the call
-#def getDicipline(capcodes, msg):
+def getCapInfo(settings, capcodes):
+	return
 
-'''
-print "Prio\tRevoke\tMessage"
-
-with open('../testdata/flex_clean.txt','r') as f:
-	for x in f.readlines():
-		print "%d\t%d\t%s" % (getPrio(x), int(isRevoke(x)), x),
-'''
+def printCapInfo(capinfo):
+	return

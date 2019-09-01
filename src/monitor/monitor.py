@@ -25,9 +25,10 @@ from termcolor import colored
 
 # Import our own stuff <3
 from utils.settings import *
-from utils.logger import *
 from utils.header import *
+from utils.logger import *
 from utils.alerter import *
+from utils.filter import *
 
 # Disable pygame's "hello" message
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
@@ -39,15 +40,7 @@ printheader()
 settings = getSettings()
 
 # Add triggers to settings
-path_capcodes = os.path.abspath(os.path.dirname(__file__)) + "/config/triggers/capcodes.txt"
-tr_capcodes = open(path_capcodes, "r").read().splitlines()
-
-path_words = os.path.abspath(os.path.dirname(__file__)) + "/config/triggers/words.txt"
-tr_words = open(path_words, "r").read().splitlines()
-
-settings['triggers'] = dict()
-settings['triggers']['capcodes'] = tr_capcodes
-settings['triggers']['words'] = tr_words
+settings = setTriggers(settings)
 
 # Connect to database
 con = None
@@ -75,11 +68,7 @@ lastread = 0		# Time of last message reading.
 timestamp = ''		# Timestamp of the received message
 capcodes = []		# Stores capcodes temporarily.
 message = ''		# The actual received message
-
-# Regexes
-regex_prio1 = "^A\s?1|\s?A\s?1|PRIO\s?1|^P\s?1"
-regex_prio2 = "^A\s?2|\s?A\s?2|PRIO\s?2|^P\s?2"
-regex_prio3 = "^B\s?1|^B\s?2|^B\s?3|PRIO\s?3|^P\s?3|PRIO\s?4|^P\s?4"
+prio = 0			# Priority of alert
 
 # Open a subprocess and listen to the radio
 multimon_ng = subprocess.Popen(settings['radio']['command'], stdout=subprocess.PIPE, stderr=open(os.devnull, 'w'), shell=True)
@@ -94,10 +83,12 @@ print colored(multimon_ng.pid, 'cyan')
 try:
 	# We wanna run another cycle?
     while True:
+		# Add a sleep so we don't burn our CPU (oops)
 		time.sleep(0.001)
+
 		line = ''
 
-		# If radio is NOT available
+		# If radio is NOT accessible
 		if multimon_ng.poll() != None:
 			print colored('Cannot claim radio thread. (Already in use?)', 'red')
 			break
@@ -149,28 +140,28 @@ try:
 				# Save raw if wanted
 				saveraw(line, settings)
 
-				# Substring the needed parts (DIFFERENT FROM ORIGINAL)
+				# Substring the needed parts and set globals
 				timestamp = line[6:25]
 				groupid = line[37:43]
 				capcode = line[45:54]
 				message = line[60:]
+				prio = getPrio(message)
 
 				# We are entering a new group...
 				reading = True
 				lastread = time.time()
 
-				# Check to see if we can detect a priority and assign color
-				if re.search(regex_prio1, message, re.IGNORECASE):
+				# Define color for monitor
+				if prio is 1:
 					color = 'red'
-
-				elif re.search(regex_prio2, message, re.IGNORECASE):
+				elif prio is 2:
 					color = 'yellow'
-
-				elif re.search(regex_prio3, message, re.IGNORECASE):
+				elif prio is 3 or prio is 10:
 					color = 'green'
-
+				elif prio is 4 or prio is 11:
+					color = 'cyan'
 				else:
-					color = 'magenta'
+					color = 'white'
 
 				# If same groupcode, just append the capcode to the console
 				# Also append capcode to list of capcodes for this group

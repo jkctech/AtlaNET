@@ -31,3 +31,13 @@ def getSettings():
 		print colored('Could not load in config file:', 'red')
 		print colored(e, 'red')
 		sys.exit()
+
+def setTriggers(settings):
+	path_capcodes = os.path.abspath(os.path.dirname(__file__)) + "/../config/triggers/capcodes.txt"
+	tr_capcodes = open(path_capcodes, "r").read().splitlines()
+	path_words = os.path.abspath(os.path.dirname(__file__)) + "/../config/triggers/words.txt"
+	tr_words = open(path_words, "r").read().splitlines()
+	settings['triggers'] = dict()
+	settings['triggers']['capcodes'] = tr_capcodes
+	settings['triggers']['words'] = tr_words
+	return settings
