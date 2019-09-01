@@ -1,10 +1,11 @@
 import os
+import sys
 import pyttsx3
 import pygame
 import time
 import serial
 
-def alert(message, settings, count = 2, volume = 1):
+def alert(settings, message, count = 2, volume = 1):
 	ser = serial.Serial(settings['serial']['port'], settings['serial']['baudrate'])
 	time.sleep(2)
 	ser.write('+')
@@ -24,3 +25,13 @@ def alert(message, settings, count = 2, volume = 1):
 		engine.runAndWait()
 		time.sleep(0.5)
 	ser.write('-')
+
+def hasTrigger(settings, capcodes, message):
+	for capcode in capcodes:
+		capcode = capcode[2:]
+		if capcode in settings['triggers']['capcodes']:
+			return True
+	for word in settings['triggers']['words']:
+		if message.lower().__contains__(str(word.lower())):
+			return True
+	return False

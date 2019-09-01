@@ -5,8 +5,8 @@
 		"rawdatefiles": true,
 		"rawpath": "/../logs/raw/",
 		"saverawunique": false,
-		"uniquepath": "/../logs/unique/",
 		"uniquedatefiles": true,
+		"uniquepath": "/../logs/unique/",
 		"onerror": ""
 	},
     "radio":{

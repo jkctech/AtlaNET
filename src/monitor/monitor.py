@@ -50,6 +50,17 @@ except:
 	print colored('Could not load in config file.', 'red')
 	sys.exit()
 
+# Add triggers to settings
+path_capcodes = os.path.abspath(os.path.dirname(__file__)) + "/config/triggers/capcodes.txt"
+tr_capcodes = open(path_capcodes, "r").read().splitlines()
+
+path_words = os.path.abspath(os.path.dirname(__file__)) + "/config/triggers/words.txt"
+tr_words = open(path_words, "r").read().splitlines()
+
+settings['triggers'] = dict()
+settings['triggers']['capcodes'] = tr_capcodes
+settings['triggers']['words'] = tr_words
+
 # Connect to database
 con = None
 if settings['mysql']['enabled']:
@@ -138,9 +149,10 @@ try:
 							print colored(r.status_code, 'red'),
 							print colored(r.reason, 'magenta')
 				reading = False
-				# Check if we need voice
-				if message.lower().__contains__("den helder"):
-					alert(message, settings)
+				
+				# Check if we want to play an alert
+				if hasTrigger(settings, capcodes, message):
+					alert(settings, message)
 				continue
 		
 		finally:
