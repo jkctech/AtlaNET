@@ -24,6 +24,7 @@ from dateutil import tz
 from termcolor import colored
 
 # Import our own stuff <3
+from utils.settings import *
 from utils.logger import *
 from utils.header import *
 from utils.alerter import *
@@ -34,21 +35,8 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 # Print header design
 printheader()
 
-# Config File options
-config_file = os.path.abspath(os.path.dirname(__file__)) + "/config/config.json"
-config_file_default = os.path.abspath(os.path.dirname(__file__)) + "/config/config_default.json"
-
-# Fallback to default if needed
-if not os.path.exists(config_file) or not os.path.isfile(config_file):
-	config_file = config_file_default
-
-# Try reading the config file
-try:
-	with open(config_file) as json_data_file:
-		settings = json.load(json_data_file)
-except:
-	print colored('Could not load in config file.', 'red')
-	sys.exit()
+# Get settings from files
+settings = getSettings()
 
 # Add triggers to settings
 path_capcodes = os.path.abspath(os.path.dirname(__file__)) + "/config/triggers/capcodes.txt"

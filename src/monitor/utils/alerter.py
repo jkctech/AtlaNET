@@ -1,3 +1,14 @@
+#!/usr/bin/python
+
+#
+# Alerter.py
+#
+# AtlaNET P2000 Receiver - By: JKCTech
+# https://github.com/jkctech/AtlaNET
+#
+# Controller determening if alerts should be fired and it's funciton to do so.
+#
+
 import os
 import sys
 import pyttsx3

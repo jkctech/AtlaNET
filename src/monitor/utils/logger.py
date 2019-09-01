@@ -1,3 +1,14 @@
+#!/usr/bin/python
+
+#
+# Logger.py
+#
+# AtlaNET P2000 Receiver - By: JKCTech
+# https://github.com/jkctech/AtlaNET
+#
+# Controls the saving of messages to the logfiles.
+#
+
 import os
 from datetime import date
 
