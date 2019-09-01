@@ -1,3 +1,7 @@
+01-09-2019
+ - Fixed monitor taking up 100% CPU (oops)
+ - Changed colors in documentation
+
 30-08-2019
  - Added serial controller to turn on a strobe light when an alert is received
 

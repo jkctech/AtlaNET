@@ -95,6 +95,7 @@ print colored(multimon_ng.pid, 'cyan')
 try:
 	# We wanna run another cycle?
     while True:
+		time.sleep(0.001)
 		line = ''
 
 		# If radio is NOT available
