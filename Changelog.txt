@@ -1,4 +1,5 @@
 02-09-2019
+ - Added realtime capcode resolving from central database
  - Split some code up to multiple files
  - Replaced old regex prio patterns with new ones
  - Added getPrio()

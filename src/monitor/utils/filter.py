@@ -15,12 +15,12 @@ import re
 # Return the priority of the alert
 def getPrio(msg):
 	# Tests
-	if re.search("((^test(oproep)?|proefalarm)|^The quick brown fox jumps)", msg, re.IGNORECASE):
+	if re.search("(^test(oproep)?|proefalarm)|^The quick brown fox jumps", msg, re.IGNORECASE):
 		return 5
 
 	# A prio's [1 - 4]
 	for i in range(1,5):
-		if re.search("(^A\s?%d|P(RIO)?\s?%d)" % (i,i), msg, re.IGNORECASE):
+		if re.search("(^(\(Directe inzet:\s?)?)A\s?%d|P(RIO)?\s?%d" % (i,i), msg, re.IGNORECASE):
 			return i
 
 	# B prio's [1 - 3]
@@ -33,9 +33,3 @@ def getPrio(msg):
 # Is this a revoke message?
 def isRevoke(msg):
 	return bool(re.search("intrekken", msg, re.IGNORECASE))
-
-def getCapInfo(settings, capcodes):
-	return
-
-def printCapInfo(capinfo):
-	return

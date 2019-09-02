@@ -1,0 +1,46 @@
+#!/usr/bin/python
+
+#
+# Resolver.py
+#
+# AtlaNET P2000 Receiver - By: JKCTech
+# https://github.com/jkctech/AtlaNET
+# 
+# Connects to the endpoint in attemtp to resolve capcodes and locations
+#
+
+import requests
+import json
+from termcolor import colored
+
+def getCapInfo(settings, capcodes):
+	try:
+		r = requests.get(settings['api']['endpoint'] + "get/capinfo", params={
+			'apikey': settings['api']['key'],
+			'capcodes': ','.join(capcodes)
+		})
+	except (Exception) as e:
+		print colored('Capcode Database:', 'cyan'), colored('FAILED!', 'red'),
+		print colored('Could not reach endpoint.', 'magenta')
+		print colored(e, 'white')
+	else:
+		if r.status_code is not 200:
+			print colored(r.status_code, 'red')
+			print colored(r.text, 'white'),
+	return r.text
+
+def printCapInfo(capinfo, capcodes):
+	capinfo = json.loads(capinfo)['result']
+	for capcode in capcodes:
+		print '                   ',
+		print colored(capcode, 'red') + ":",
+		infos = []
+		if capcode in capinfo:
+			if capinfo[capcode]['plaats']:
+				infos.append(capinfo[capcode]['plaats'])
+			if capinfo[capcode]['description']:
+				infos.append(capinfo[capcode]['description'])
+		if len(infos) == 0:
+			infos.append("Onbekend")
+		print " | ".join(infos)
+	return

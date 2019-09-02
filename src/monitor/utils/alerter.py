@@ -39,7 +39,6 @@ def alert(settings, message, count = 2, volume = 1):
 
 def hasTrigger(settings, capcodes, message):
 	for capcode in capcodes:
-		capcode = capcode[2:]
 		if capcode in settings['triggers']['capcodes']:
 			return True
 	for word in settings['triggers']['words']:

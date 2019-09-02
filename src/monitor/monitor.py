@@ -17,7 +17,6 @@ import subprocess
 import re
 import fcntl
 import requests
-import json
 import mysql.connector
 from datetime import datetime, date
 from dateutil import tz
@@ -29,6 +28,7 @@ from utils.header import *
 from utils.logger import *
 from utils.alerter import *
 from utils.filter import *
+from utils.resolver import *
 
 # Disable pygame's "hello" message
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
@@ -104,12 +104,16 @@ try:
 				# Save raw if wanted
 				saverawunique(message, settings)
 
+				# Request capcode info from AtlaNET
+				capinfo = getCapInfo(settings, capcodes)
+				printCapInfo(capinfo, capcodes)
+
 				if settings['common']['debug']:
-					print colored('\nAtlaNET:', 'cyan'),
+					print colored('AtlaNET:', 'cyan'),
 
 				# Send to server with a POST
 				try:
-					r = requests.post(settings['api']['endpoint'], data={
+					r = requests.post(settings['api']['endpoint'] + "post/insert", data={
 						'apikey': settings['api']['key'],
 						'timestamp': timestamp, 
 						'message': message, 
@@ -127,6 +131,10 @@ try:
 						else:
 							print colored(r.status_code, 'red'),
 							print colored(r.reason, 'magenta')
+
+				if settings['common']['debug']:
+					print ''
+
 				reading = False
 				
 				# Check if we want to play an alert
@@ -143,7 +151,7 @@ try:
 				# Substring the needed parts and set globals
 				timestamp = line[6:25]
 				groupid = line[37:43]
-				capcode = line[45:54]
+				capcode = line[47:54]
 				message = line[60:]
 				prio = getPrio(message)
 
@@ -166,7 +174,6 @@ try:
 				# If same groupcode, just append the capcode to the console
 				# Also append capcode to list of capcodes for this group
 				if groupid == groupidold:
-					print colored(capcode, 'white'),
 					capcodes.append(capcode)
 
 				# We entered a new group, so display the info
@@ -175,11 +182,8 @@ try:
 					utc = utc.replace(tzinfo=tz.tzutc())
 					local = utc.astimezone(tz.tzlocal())
 					local = local.strftime("%d-%m-%Y %H:%M:%S")
-					
-					print ' '
-					print colored(local,'blue', attrs=['bold']), colored(message, color,  attrs=['bold']),
-					print '                  ',
-					print colored(capcode, 'white'),
+
+					print "\n", colored(local,'blue', attrs=['bold']), colored(message, color,  attrs=['bold'])
 
 					# This is a new group, wipe capcode list, add this one and set groupid
 					capcodes = [capcode]
@@ -192,6 +196,7 @@ except KeyboardInterrupt:
 
 # Catch crashes
 except (Exception) as e:
+	alert(settings, "Monitor crash!", 1)
 	print colored('\nException:', 'red')
 	print e
 

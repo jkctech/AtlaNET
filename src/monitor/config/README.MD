@@ -37,3 +37,6 @@
 ### capcodes.txt
 In this file you can place a list of capcodes seperated by a newline on which the monitor triggers an alert.\
 Capcodes have to have a 7 digit format by adding leading zero's. This means the capcode "123456" has to be put in the file as "0123456".
+
+### words.txt
+In this file you can place a list of words seperated by a newline on which the monitor triggers an alert.\
