@@ -4,6 +4,7 @@
  - Replaced old regex prio patterns with new ones
  - Added getPrio()
  - Monitor now uses getPrio()
+ - Added discipline identifiers to the monitor
 
 01-09-2019
  - Fixed monitor taking up 100% CPU (oops)

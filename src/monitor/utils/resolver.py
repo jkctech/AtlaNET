@@ -23,19 +23,24 @@ def getCapInfo(settings, capcodes):
 		print colored('Capcode Database:', 'cyan'), colored('FAILED!', 'red'),
 		print colored('Could not reach endpoint.', 'magenta')
 		print colored(e, 'white')
-	else:
-		if r.status_code is not 200:
-			print colored(r.status_code, 'red')
-			print colored(r.text, 'white'),
+		return
+	if r.status_code is not 200:
+		print colored(r.status_code, 'red')
+		print colored(r.text, 'white'),
 	return r.text
 
-def printCapInfo(capinfo, capcodes):
-	capinfo = json.loads(capinfo)['result']
+def printCapInfo(settings, capinfo, capcodes):
+	try:
+		capinfo = json.loads(capinfo)['result']
+	except:
+		return
 	for capcode in capcodes:
 		print '                   ',
 		print colored(capcode, 'red') + ":",
 		infos = []
 		if capcode in capinfo:
+			if capinfo[capcode]['discipline']:
+				infos.append(disciplineToString(settings, capinfo[capcode]['discipline'])['name'])
 			if capinfo[capcode]['plaats']:
 				infos.append(capinfo[capcode]['plaats'])
 			if capinfo[capcode]['description']:
@@ -43,4 +48,7 @@ def printCapInfo(capinfo, capcodes):
 		if len(infos) == 0:
 			infos.append("Onbekend")
 		print " | ".join(infos)
-	return
+
+def disciplineToString(settings, discipline):
+	return settings['lists']['disciplines'][str(discipline)]
+	pass

@@ -42,6 +42,9 @@ settings = getSettings()
 # Add triggers to settings
 settings = setTriggers(settings)
 
+# Download info from server
+refreshServerLists(settings)
+
 # Connect to database
 con = None
 if settings['mysql']['enabled']:
@@ -106,7 +109,7 @@ try:
 
 				# Request capcode info from AtlaNET
 				capinfo = getCapInfo(settings, capcodes)
-				printCapInfo(capinfo, capcodes)
+				printCapInfo(settings, capinfo, capcodes)
 
 				if settings['common']['debug']:
 					print colored('AtlaNET:', 'cyan'),
@@ -195,10 +198,10 @@ except KeyboardInterrupt:
 	print colored('\nTerminated by user.', 'red')
 
 # Catch crashes
-except (Exception) as e:
-	alert(settings, "Monitor crash!", 1)
-	print colored('\nException:', 'red')
-	print e
+#except (Exception) as e:
+#	alert(settings, "Monitor crash!", 1)
+#	print colored('\nException:', 'red')
+#	print e
 
 # Cleanup
 finally:

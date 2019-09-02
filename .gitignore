@@ -4,3 +4,4 @@ testdata*
 test*
 cache*
 ~$*
+clean.sh

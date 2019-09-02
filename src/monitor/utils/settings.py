@@ -12,6 +12,7 @@
 import os
 import sys
 import json
+import requests
 from termcolor import colored
 
 def getSettings():
@@ -41,3 +42,49 @@ def setTriggers(settings):
 	settings['triggers']['capcodes'] = tr_capcodes
 	settings['triggers']['words'] = tr_words
 	return settings
+
+def getDisciplines(settings):
+	try:
+		r = requests.get(settings['api']['endpoint'] + "get/disciplines", params={
+			'apikey': settings['api']['key']
+		})
+	except (Exception) as e:
+		print colored('Could not download discipline list.', 'red')
+		print e
+		sys.exit()
+	if r.status_code is not 200:
+		print colored('Could not read discipline list.', 'red')
+		print str(r.status_code) + ": " + r.reason
+		sys.exit()
+	try:
+		result = json.loads(r.text)
+	except:
+		print colored('Could not load JSON discipline list.', 'red')
+		sys.exit()
+	return result
+
+def getRegios(settings):
+	try:
+		r = requests.get(settings['api']['endpoint'] + "get/regios", params={
+			'apikey': settings['api']['key']
+		})
+	except (Exception) as e:
+		print colored('Could not download regio list.', 'red')
+		print e
+		sys.exit()
+	if r.status_code is not 200:
+		print colored('Could not read regio list.', 'red')
+		print str(r.status_code) + ": " + r.reason
+		sys.exit()
+	try:
+		result = json.loads(r.text)
+	except:
+		print colored('Could not load JSON regio list.', 'red')
+		sys.exit()
+	return result
+
+
+def refreshServerLists(settings):
+	settings['lists'] = dict()
+	settings['lists']['disciplines'] = getDisciplines(settings)['result']
+	settings['lists']['regios'] = getRegios(settings)['result']
