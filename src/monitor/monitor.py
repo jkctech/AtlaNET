@@ -23,6 +23,7 @@ from dateutil import tz
 from termcolor import colored
 
 # Import our own stuff <3
+from utils.radio import *
 from utils.settings import *
 from utils.header import *
 from utils.logger import *
@@ -80,21 +81,34 @@ multimon_ng = subprocess.Popen(settings['radio']['command'], stdout=subprocess.P
 # Make subprocess non-blocking so we can keep track of other stuff while nothing is happening
 fcntl.fcntl(multimon_ng.stdout.fileno(), fcntl.F_SETFL, os.O_NONBLOCK)
 
+# Check if we can access radio
+time.sleep(0.5)
+if multimon_ng.poll() != None:
+	print colored('Cannot claim radio thread, attempting override...', 'magenta')
+	killRadio()
+	time.sleep(1)
+	multimon_ng = subprocess.Popen(settings['radio']['command'], stdout=subprocess.PIPE, stderr=open(os.devnull, 'w'), shell=True)
+	fcntl.fcntl(multimon_ng.stdout.fileno(), fcntl.F_SETFL, os.O_NONBLOCK)
+	if multimon_ng.poll() != None:
+		print colored('Could not force override, terminating...', 'red')
+		sys.exit()
+	else:
+		print colored('Reclaimed radio, proceeding...', 'green')
+
 # Initialization info
 print 'Started listener with PID:',
 print colored(multimon_ng.pid, 'cyan')
+print colored("Watching...", 'cyan')
 
 try:
 	# We wanna run another cycle?
     while True:
-		# Add a sleep so we don't burn our CPU (oops)
-		time.sleep(0.001)
+		time.sleep(0.001) # Add a sleep so we don't burn our CPU (oops)
+		line = '' # Store the received line
 
-		line = ''
-
-		# If radio is NOT accessible
+		# Check accessibility of the radio
 		if multimon_ng.poll() != None:
-			print colored('Cannot claim radio thread. (Already in use?)', 'red')
+			print colored('Radio terminated by external control.', 'red')
 			break
 
 		# Readline from radio
@@ -199,13 +213,13 @@ except KeyboardInterrupt:
 	print colored('\nTerminated by user.', 'red')
 
 # Catch crashes
-#except (Exception) as e:
-#	alert(settings, "Monitor crash!", 1)
-#	print colored('\nException:', 'red')
-#	print e
+except (Exception) as e:
+	alert(settings, "Monitor crash")
+	print colored('\nException:', 'red')
+	print e
 
 # Cleanup
 finally:
-	multimon_ng.kill()
+	killRadio()
 	if con:
 		con.close()

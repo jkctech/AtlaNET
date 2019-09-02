@@ -1,3 +1,7 @@
+03-09-2019
+ - Fixed leaving radio running on crash
+ - Program will now terminate other claiming threads when needed
+
 02-09-2019
  - Added realtime capcode resolving from central database
  - Split some code up to multiple files
