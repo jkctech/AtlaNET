@@ -65,6 +65,7 @@ if settings['mysql']['enabled']:
 # Variables
 reading = False		# Are we reading a messagegroup?
 groupidold = ""		# Last GroupID to compare to see if we entered a new message.
+messageold = ""		# Store last message to identify new groups
 lastread = 0		# Time of last message reading.
 
 # Storage for server connector (Only the ones we need to send)
@@ -176,7 +177,7 @@ try:
 
 				# If same groupcode, just append the capcode to the console
 				# Also append capcode to list of capcodes for this group
-				if groupid == groupidold:
+				if groupid == groupidold and message == messageold:
 					capcodes.append(capcode)
 
 				# We entered a new group, so display the info
@@ -190,8 +191,8 @@ try:
 
 					# This is a new group, wipe capcode list, add this one and set groupid
 					capcodes = [capcode]
-					#capcodes.append(capcode)
 					groupidold = groupid
+					messageold = message
 
 # Keyboard Interrupt (Ctrl + C)
 except KeyboardInterrupt:

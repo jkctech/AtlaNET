@@ -27,13 +27,13 @@ def getCapInfo(settings, capcodes):
 	if r.status_code is not 200:
 		print colored(r.status_code, 'red')
 		print colored(r.text, 'white'),
-	return r.text
+	try:
+		capinfo = json.loads(r.text)['result']
+	except:
+		return []
+	return capinfo
 
 def printCapInfo(settings, capinfo, capcodes):
-	try:
-		capinfo = json.loads(capinfo)['result']
-	except:
-		return
 	for capcode in capcodes:
 		print '                   ',
 		print colored(capcode, 'red') + ":",
