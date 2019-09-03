@@ -32,4 +32,4 @@ def getPrio(msg):
 
 # Is this a revoke message?
 def isRevoke(msg):
-	return bool(re.search("intrekken", msg, re.IGNORECASE))
+	return bool(re.search("intrekken|ingetrokken|vervalt|vervallen", msg, re.IGNORECASE))

@@ -1,3 +1,6 @@
+04-09-2019
+ - Added Twitter hook
+
 03-09-2019
  - Fixed leaving radio running on crash
  - Program will now terminate other claiming threads when needed

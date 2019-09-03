@@ -30,6 +30,7 @@ from utils.logger import *
 from utils.alerter import *
 from utils.filter import *
 from utils.resolver import *
+from utils.twitter_utils import *
 
 # Disable pygame's "hello" message
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"

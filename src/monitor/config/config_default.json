@@ -31,5 +31,12 @@
 	"serial":{
 		"port":"/dev/ttyUSB0",
 		"baudrate":9600
+	},
+	"twitter":{
+		"consumer_key":"",
+		"consumer_secret":"",
+		"user_key":"",
+		"user_secret":"",
+		"user_id":""
 	}
 }
