@@ -40,8 +40,8 @@ def alert(settings, message, count = 2, volume = 1):
 def hasTrigger(settings, capcodes, message):
 	for capcode in capcodes:
 		if capcode in settings['triggers']['capcodes']:
-			return True
+			return capcode
 	for word in settings['triggers']['words']:
 		if message.lower().__contains__(str(word.lower())):
-			return True
+			return word
 	return False

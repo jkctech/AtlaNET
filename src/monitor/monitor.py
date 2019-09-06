@@ -72,7 +72,6 @@ close = False		# Used to force close a capgroup if conflict is detected
 # Storage for server connector (Only the ones we need to send)
 timestamp = ''		# Timestamp of the received message
 capcodes = []		# Stores capcodes temporarily.
-capinfo = []		# Stores resolved capcode info
 message = ''		# The actual received message
 prio = 0			# Priority of alert
 
@@ -124,7 +123,6 @@ try:
 				groupid = line[37:43]
 				capcode = line[47:54]
 				message = line[60:]
-				prio = getPrio(message)
 
 				# Catch capgroup conflicts and force close the group
 				if groupid == groupidold and message != messageold:
@@ -137,6 +135,9 @@ try:
 			if reading == True and time.time() - lastread > settings['radio']['triggertime'] or close:
 				# Save raw if wanted
 				saverawunique(message, settings)
+
+				# Define some info
+				prio = getPrio(message)
 
 				# Request capcode info from AtlaNET
 				capinfo = getCapInfo(settings, capcodes)
@@ -173,15 +174,22 @@ try:
 				close = False
 				
 				# Process the completed alert
-				process(settings, capcodes, message)
+				msgobject = {
+					"message": message,
+					"capcodes": capcodes,
+					"capinfo": capinfo,
+					"prio": prio
+				}
+
+				process(settings, msgobject)
 
 				continue
 		
 		finally:
+			saveraw(line, settings)
+
 			# Start of a new P2000 message
 			if line.__contains__("ALN") and line.startswith('FLEX'):
-				# Save raw if wanted
-				saveraw(line, settings)
 
 				# We are entering a new group...
 				reading = True

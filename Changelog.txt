@@ -1,9 +1,12 @@
 06-09-2019
  - Fixed issue #1 (Double entries conflict).
  - Fixed bug where capcode description starting with number got interpreted as int.
+ - Added support for multiple Twitter Hooks
  - Utilized Twitter hook and assigned special cases
  - Introduced dedicated area for processing a mnessage so the workflow can be defined.
  - Removed "Hide Pygame hello message".
+ - hasTrigger() now returns the triggered string or capcode
+ - Fixed some unicode bugs
 
 04-09-2019
  - Added Twitter hook

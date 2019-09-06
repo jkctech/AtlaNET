@@ -33,10 +33,12 @@
 		"baudrate":9600
 	},
 	"twitter":{
-		"consumer_key":"",
-		"consumer_secret":"",
-		"user_key":"",
-		"user_secret":"",
-		"user_id":""
+		"AtlaNET_P2000": {
+			"consumer_key":"",
+			"consumer_secret":"",
+			"user_key":"",
+			"user_secret":"",
+			"user_id":""
+		}
 	}
 }

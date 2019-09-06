@@ -12,34 +12,40 @@
 
 from datetime import datetime
 from utils.alerter import *
+from utils.resolver import *
 from utils.twitter_utils import *
 
 # Emoji Icons
-light = u'\U0001f6A8'
-heli = u'\U0001f681'
-ambu = u'\U0001f691'
-caduceus = u'\U00002695'
+light = u'\U0001f6A8'.encode('utf-8')
+caduceus = u'\U00002695'.encode('utf-8')
+heli = u'\U0001f681'.encode('utf-8')
+ambu = u'\U0001f691'.encode('utf-8')
+brw = u'\U0001F692'.encode('utf-8')
+pol = u'\U0001F693'.encode('utf-8')
+boat = u'\U0001F6E5'.encode('utf-8')
+pager = u'\U0001F4DF'.encode('utf-8')
 
-purple = u'\U0001F7E3'
-green = u'\U0001F7E2'
-yellow = u'\U0001F7E1'
-red = u'\U0001F534'
+red = u'\U0001F534'.encode('utf-8')
 
 specials = {
 	# Heli's
-	"0120901" : purple + " #Traumateam #lfl01 #LifeLiner1 " + heli,
-	"1420059" : purple + " #Traumateam #lfl02 #LifeLiner2 " + heli,
-	"0923993" : purple + " #Traumateam #lfl03 #LifeLiner3 " + heli,
-	"0320591" : green + " #Traumateam #medic01 #Waddenheli " + heli,
-	"0320592" : green + " #Traumateam #medic02 #Waddenheli " + heli,
-	"1220009" : yellow + " #Traumateam #MMT " + ambu,
+	"0120901" : red + " #Traumateam #lfl01 #LifeLiner1 " + heli,
+	"1420059" : red + " #Traumateam #lfl02 #LifeLiner2 " + heli,
+	"0923993" : red + " #Traumateam #lfl03 #LifeLiner3 " + heli,
+	"0320591" : red + " #Traumateam #medic01 #Waddenheli " + heli,
+	"0320592" : red + " #Traumateam #medic02 #Waddenheli " + heli,
+	"1220009" : red + " #Traumateam #MMT " + ambu,
 
 	# Sigma
 	"0220828" : red + " #SIGMA " + caduceus,
 	"0402110" : red + " #SIGMA " + caduceus
 }
 
-def process(settings, capcodes, message):
+def process(settings, msgobject):
+	capinfo = msgobject['capinfo']
+	capcodes = msgobject['capcodes']
+	message = msgobject['message']
+
 	# Special alerts for twitter system
 	for cap in capcodes:
 		if cap in specials:
@@ -47,11 +53,33 @@ def process(settings, capcodes, message):
 			break
 
 	# Check for keywords and capcodes on local alarm
-	if hasTrigger(settings, capcodes, message):
+	trigger = hasTrigger(settings, capcodes, message)
+	if trigger:
+		# Send high prio tweets to private Twitter
+		if msgobject['prio'] == 1:
+			disc = getDiscipline(settings, capinfo)
+			did = disc['id']
+			
+			if did == 2: icon = pol
+			elif did == 3: icon = brw
+			elif did == 4: icon = ambu
+			elif did == 5: icon = heli
+			elif did == 6 or did == 7 or did == 8: icon = boat
+			else: icon = pager
+
+			msg = "{0} #{1} #{2} {3} {4}".format(
+				red, 
+				trigger.replace(" ", ""), 
+				disc['name'].replace(" ", ""),
+				icon,
+				message
+			)
+			sendTweet(settings, msg, user="JKCTech")
+
 		# Volume control on schedule
 		vol = 1
 		now = datetime.now()
 		if now.hour >= 22 or now.hour <= 8:
-			vol = 0.3
+			vol = 0.5
 		# Send alert
 		alert(settings, message, volume=vol)

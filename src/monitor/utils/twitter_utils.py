@@ -12,12 +12,13 @@
 import sys
 from twitter import *
 
-def sendTweet(settings, message):
+def sendTweet(settings, message, user = "AtlaNET_P2000"):
+	twuser = settings['twitter'][user]
 	t = Twitter(auth=OAuth(
-		settings['twitter']['user_key'],
-		settings['twitter']['user_secret'],
-		settings['twitter']['consumer_key'],
-		settings['twitter']['consumer_secret']))
+		twuser['user_key'],
+		twuser['user_secret'],
+		twuser['consumer_key'],
+		twuser['consumer_secret']))
 	try:
 		status = t.statuses.update(status=message)
 	except (Exception) as e:

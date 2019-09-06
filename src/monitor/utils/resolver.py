@@ -40,7 +40,7 @@ def printCapInfo(settings, capinfo, capcodes):
 		infos = []
 		if capcode in capinfo:
 			if capinfo[capcode]['discipline']:
-				infos.append(disciplineToString(settings, capinfo[capcode]['discipline'])['name'])
+				infos.append(enumToDiscipline(settings, capinfo[capcode]['discipline'])['name'])
 			if capinfo[capcode]['plaats']:
 				infos.append(str(capinfo[capcode]['plaats']))
 			if capinfo[capcode]['description']:
@@ -49,6 +49,17 @@ def printCapInfo(settings, capinfo, capcodes):
 			infos.append("Onbekend")
 		print " | ".join(infos)
 
-def disciplineToString(settings, discipline):
+def enumToDiscipline(settings, discipline):
 	return settings['lists']['disciplines'][str(discipline)]
 	pass
+
+def getDiscipline(settings, capinfo):
+	result = []
+	order = [10, 9, 5, 6, 7, 8, 13, 2, 3, 4, 11, 14, 12, 1]
+	for cap in capinfo:
+		if capinfo[cap]['discipline']:
+			result.append(capinfo[cap]['discipline'])
+	for i in order:
+		if i in result:
+			return enumToDiscipline(settings, i)
+	
