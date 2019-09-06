@@ -136,9 +136,6 @@ try:
 				# Save raw if wanted
 				saverawunique(message, settings)
 
-				# Define some info
-				prio = getPrio(message)
-
 				# Request capcode info from AtlaNET
 				capinfo = getCapInfo(settings, capcodes)
 				printCapInfo(settings, capinfo, capcodes)
@@ -190,10 +187,12 @@ try:
 
 			# Start of a new P2000 message
 			if line.__contains__("ALN") and line.startswith('FLEX'):
-
 				# We are entering a new group...
 				reading = True
 				lastread = time.time()
+
+				# Define some info
+				prio = getPrio(message)
 
 				# Define color for monitor
 				if prio is 1:

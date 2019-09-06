@@ -14,10 +14,6 @@ import re
 
 # Return the priority of the alert
 def getPrio(msg):
-	# Tests
-	if re.search("(^test(oproep)?|proefalarm)|^The quick brown fox jumps", msg, re.IGNORECASE):
-		return 5
-
 	# A prio's [1 - 4]
 	for i in range(1,5):
 		if re.search("(^(\(Directe inzet:\s?)?)A\s?%d|P(RIO)?\s?%d" % (i,i), msg, re.IGNORECASE):
@@ -27,6 +23,10 @@ def getPrio(msg):
 	for i in range(1,4):
 		if re.search("(^|\s)B\s?%d" % (i), msg, re.IGNORECASE):
 			return i + 9
+	
+	# Tests
+	if re.search("(^test(oproep)?|proefalarm)|^The quick brown fox jumps", msg, re.IGNORECASE):
+		return 5
 
 	return 0
 
