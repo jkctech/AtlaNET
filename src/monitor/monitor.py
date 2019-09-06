@@ -31,9 +31,7 @@ from utils.alerter import *
 from utils.filter import *
 from utils.resolver import *
 from utils.twitter_utils import *
-
-# Disable pygame's "hello" message
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+from utils.processor import *
 
 # Print header design
 printheader()
@@ -69,10 +67,12 @@ reading = False		# Are we reading a messagegroup?
 groupidold = ""		# Last GroupID to compare to see if we entered a new message.
 messageold = ""		# Store last message to identify new groups
 lastread = 0		# Time of last message reading.
+close = False		# Used to force close a capgroup if conflict is detected
 
 # Storage for server connector (Only the ones we need to send)
 timestamp = ''		# Timestamp of the received message
 capcodes = []		# Stores capcodes temporarily.
+capinfo = []		# Stores resolved capcode info
 message = ''		# The actual received message
 prio = 0			# Priority of alert
 
@@ -115,11 +115,26 @@ try:
 		# Readline from radio
 		try:
 			line = multimon_ng.stdout.readline()
+			
+			if line.__contains__("ALN") and line.startswith('FLEX'):
+				reading = True
+
+				# Substring the needed parts and set globals
+				timestamp = line[6:25]
+				groupid = line[37:43]
+				capcode = line[47:54]
+				message = line[60:]
+				prio = getPrio(message)
+
+				# Catch capgroup conflicts and force close the group
+				if groupid == groupidold and message != messageold:
+					close = True
+					raise Exception
 
 		# Nothing to read... Is this the end?
 		except:
 			# If we are reading a group and nothing seen for X time, assume ending
-			if reading == True and time.time() - lastread > settings['radio']['triggertime']:
+			if reading == True and time.time() - lastread > settings['radio']['triggertime'] or close:
 				# Save raw if wanted
 				saverawunique(message, settings)
 
@@ -155,10 +170,11 @@ try:
 					print ''
 
 				reading = False
+				close = False
 				
-				# Check if we want to play an alert
-				if hasTrigger(settings, capcodes, message):
-					alert(settings, message)
+				# Process the completed alert
+				process(settings, capcodes, message)
+
 				continue
 		
 		finally:
@@ -166,13 +182,6 @@ try:
 			if line.__contains__("ALN") and line.startswith('FLEX'):
 				# Save raw if wanted
 				saveraw(line, settings)
-
-				# Substring the needed parts and set globals
-				timestamp = line[6:25]
-				groupid = line[37:43]
-				capcode = line[47:54]
-				message = line[60:]
-				prio = getPrio(message)
 
 				# We are entering a new group...
 				reading = True
@@ -192,7 +201,7 @@ try:
 
 				# If same groupcode, just append the capcode to the console
 				# Also append capcode to list of capcodes for this group
-				if groupid == groupidold and message == messageold:
+				if message == messageold:
 					capcodes.append(capcode)
 
 				# We entered a new group, so display the info

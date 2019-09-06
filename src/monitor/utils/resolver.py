@@ -42,9 +42,9 @@ def printCapInfo(settings, capinfo, capcodes):
 			if capinfo[capcode]['discipline']:
 				infos.append(disciplineToString(settings, capinfo[capcode]['discipline'])['name'])
 			if capinfo[capcode]['plaats']:
-				infos.append(capinfo[capcode]['plaats'])
+				infos.append(str(capinfo[capcode]['plaats']))
 			if capinfo[capcode]['description']:
-				infos.append(capinfo[capcode]['description'])
+				infos.append(str(capinfo[capcode]['description']))
 		if len(infos) == 0:
 			infos.append("Onbekend")
 		print " | ".join(infos)
