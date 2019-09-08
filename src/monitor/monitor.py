@@ -18,8 +18,6 @@ import re
 import fcntl
 import requests
 import mysql.connector
-from datetime import datetime, date
-from dateutil import tz
 from termcolor import colored
 
 # Import our own stuff <3
@@ -63,17 +61,8 @@ if settings['mysql']['enabled']:
 		exit()
 
 # Variables
-reading = False		# Are we reading a messagegroup?
-groupidold = ""		# Last GroupID to compare to see if we entered a new message.
-messageold = ""		# Store last message to identify new groups
-lastread = 0		# Time of last message reading.
-close = False		# Used to force close a capgroup if conflict is detected
-
-# Storage for server connector (Only the ones we need to send)
-timestamp = ''		# Timestamp of the received message
-capcodes = []		# Stores capcodes temporarily.
-message = ''		# The actual received message
-prio = 0			# Priority of alert
+queue = []
+lastread = 0
 
 # Open a subprocess and listen to the radio
 multimon_ng = subprocess.Popen(settings['radio']['command'], stdout=subprocess.PIPE, stderr=open(os.devnull, 'w'), shell=True)
@@ -114,116 +103,61 @@ try:
 		# Readline from radio
 		try:
 			line = multimon_ng.stdout.readline()
-			
+			saveraw(line, settings)
 			if line.__contains__("ALN") and line.startswith('FLEX'):
-				reading = True
+				queue.append(line)
+				lastread = time.time()
+		
+		# Nothing to read...
+		except:
+			pass
 
+		# Process queued messages after triggertime
+		if time.time() - lastread > settings['radio']['triggertime'] and len(queue) > 0:
+			last_msg = ""
+			last_line = ""
+			capcodes = []
+
+			cnt = 1
+			queue.append('X' * 64)
+			for line in queue:
 				# Substring the needed parts and set globals
-				timestamp = line[6:25]
-				groupid = line[37:43]
 				capcode = line[47:54]
 				message = line[60:]
 
-				# Catch capgroup conflicts and force close the group
-				if groupid == groupidold and message != messageold:
-					close = True
-					raise Exception
-
-		# Nothing to read... Is this the end?
-		except:
-			# If we are reading a group and nothing seen for X time, assume ending
-			if reading == True and time.time() - lastread > settings['radio']['triggertime'] or close:
-				# Save raw if wanted
-				saverawunique(message, settings)
-
-				# Request capcode info from AtlaNET
-				capinfo = getCapInfo(settings, capcodes)
-				printCapInfo(settings, capinfo, capcodes)
-
-				if settings['common']['debug']:
-					print colored('AtlaNET:', 'cyan'),
-
-				# Send to server with a POST
-				try:
-					r = requests.post(settings['api']['endpoint'] + "post/insert", data={
-						'apikey': settings['api']['key'],
-						'timestamp': timestamp, 
-						'message': message, 
-						'capcodes': ','.join(capcodes)
-					})
-				except:
-					if settings['common']['debug']:
-						print colored('FAILED!', 'red'),
-						print colored('Could not reach endpoint.', 'magenta')
-				else:
-					if settings['common']['debug']:
-						if r.status_code == 200:
-							print colored(r.reason, 'green'),
-							print colored(r.text, 'cyan')
-						else:
-							print colored(r.status_code, 'red'),
-							print colored(r.reason, 'magenta')
-
-				if settings['common']['debug']:
-					print ''
-
-				reading = False
-				close = False
-				
-				# Process the completed alert
-				msgobject = {
-					"message": message,
-					"capcodes": capcodes,
-					"capinfo": capinfo,
-					"prio": prio
-				}
-
-				process(settings, msgobject)
-
-				continue
-		
-		finally:
-			saveraw(line, settings)
-
-			# Start of a new P2000 message
-			if line.__contains__("ALN") and line.startswith('FLEX'):
-				# We are entering a new group...
-				reading = True
-				lastread = time.time()
-
-				# Define some info
-				prio = getPrio(message)
-
-				# Define color for monitor
-				if prio is 1:
-					color = 'red'
-				elif prio is 2:
-					color = 'yellow'
-				elif prio is 3 or prio is 10:
-					color = 'green'
-				elif prio is 4 or prio is 11:
-					color = 'cyan'
-				else:
-					color = 'white'
-
-				# If same groupcode, just append the capcode to the console
-				# Also append capcode to list of capcodes for this group
-				if message == messageold:
+				# If first or same msg, append capcode
+				if message == last_msg or cnt == 1:
+					last_msg = message
+					last_line = line
 					capcodes.append(capcode)
+				
+				# If different msg or last queue item, push out alert
+				if message != last_msg:
+					# Save raw if wanted
+					saverawunique(last_msg, settings)
 
-				# We entered a new group, so display the info
-				else:
-					utc = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')
-					utc = utc.replace(tzinfo=tz.tzutc())
-					local = utc.astimezone(tz.tzlocal())
-					local = local.strftime("%d-%m-%Y %H:%M:%S")
+					capinfo = getCapInfo(settings, capcodes)
+					prio = getPrio(last_msg)
 
-					print "\n", colored(local,'blue', attrs=['bold']), colored(message, color,  attrs=['bold'])
+					printMessage(last_line, prio)
+					printCapInfo(settings, capinfo, capcodes)
 
-					# This is a new group, wipe capcode list, add this one and set groupid
+					msgobject = {
+						"timestamp": last_line[6:25],
+						"message": last_msg,
+						"capcodes": capcodes,
+						"capinfo": capinfo,
+						"prio": prio
+					}
+
+					process(settings, msgobject)
+
+					# Set for next
+					last_msg = message
+					last_line = line
 					capcodes = [capcode]
-					groupidold = groupid
-					messageold = message
+				cnt += 1
+			queue = []
 
 # Keyboard Interrupt (Ctrl + C)
 except KeyboardInterrupt:

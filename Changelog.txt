@@ -1,3 +1,6 @@
+08-09-2019
+ - This time I REALLY fixed issue #1 by rewriting the radio logic
+
 06-09-2019
  - Fixed issue #1 (Double entries conflict).
  - Fixed bug where capcode description starting with number got interpreted as int.

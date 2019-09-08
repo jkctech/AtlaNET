@@ -25,7 +25,7 @@ def getPrio(msg):
 			return i + 9
 	
 	# Tests
-	if re.search("(^test(oproep)?|proefalarm)|^The quick brown fox jumps", msg, re.IGNORECASE):
+	if re.search("^test|^proefalarm|^The quick brown fox jumps", msg, re.IGNORECASE):
 		return 5
 
 	return 0
@@ -33,3 +33,7 @@ def getPrio(msg):
 # Is this a revoke message?
 def isRevoke(msg):
 	return bool(re.search("intrekken|ingetrokken|vervalt|vervallen", msg, re.IGNORECASE))
+
+# Is this a contact request?
+def isContact(msg):
+	return bool(re.search("contact", msg, re.IGNORECASE))

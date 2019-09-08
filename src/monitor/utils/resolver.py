@@ -12,6 +12,8 @@
 import requests
 import json
 from termcolor import colored
+from datetime import datetime
+from dateutil import tz
 
 def getCapInfo(settings, capcodes):
 	try:
@@ -42,12 +44,35 @@ def printCapInfo(settings, capinfo, capcodes):
 			if capinfo[capcode]['discipline']:
 				infos.append(enumToDiscipline(settings, capinfo[capcode]['discipline'])['name'])
 			if capinfo[capcode]['plaats']:
-				infos.append(str(capinfo[capcode]['plaats']))
+				infos.append(str(capinfo[capcode]['plaats']).encode('utf-8'))
 			if capinfo[capcode]['description']:
-				infos.append(str(capinfo[capcode]['description']))
+				infos.append(str(capinfo[capcode]['description']).encode('utf-8'))
 		if len(infos) == 0:
 			infos.append("Onbekend")
 		print " | ".join(infos)
+
+def printMessage(line, prio):
+	timestamp = line[6:25]
+	message = line[60:]
+
+	if prio is 1:
+		color = 'red'
+	elif prio is 2:
+		color = 'yellow'
+	elif prio is 3 or prio is 10:
+		color = 'green'
+	elif prio is 4 or prio is 11:
+		color = 'cyan'
+	else:
+		color = 'white'
+
+	utc = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')
+	utc = utc.replace(tzinfo=tz.tzutc())
+	local = utc.astimezone(tz.tzlocal())
+	local = local.strftime("%d-%m-%Y %H:%M:%S")
+
+	print "\n", colored(local,'blue', attrs=['bold']), colored(message, color,  attrs=['bold'])
+
 
 def enumToDiscipline(settings, discipline):
 	return settings['lists']['disciplines'][str(discipline)]

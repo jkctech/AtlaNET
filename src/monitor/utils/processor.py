@@ -10,7 +10,11 @@
 # Idealy you create your custom workflow here if you want to.
 #
 
+import requests
 from datetime import datetime
+from termcolor import colored
+
+# Own utils
 from utils.alerter import *
 from utils.resolver import *
 from utils.twitter_utils import *
@@ -45,6 +49,35 @@ def process(settings, msgobject):
 	capinfo = msgobject['capinfo']
 	capcodes = msgobject['capcodes']
 	message = msgobject['message']
+	timestamp = msgobject['timestamp']
+
+	# Send to server
+	if settings['common']['debug']:
+		print colored('AtlaNET:', 'cyan'),
+
+	# Send to server with a POST
+	try:
+		r = requests.post(settings['api']['endpoint'] + "post/insert", data={
+			'apikey': settings['api']['key'],
+			'timestamp': timestamp, 
+			'message': message, 
+			'capcodes': ','.join(capcodes)
+		})
+	except (Exception) as e:
+		if settings['common']['debug']:
+			print colored('FAILED!', 'red'),
+			print colored('Could not reach endpoint.', 'magenta')
+	else:
+		if settings['common']['debug']:
+			if r.status_code == 200:
+				print colored(r.reason, 'green'),
+				print colored(r.text, 'cyan')
+			else:
+				print colored(r.status_code, 'red'),
+				print colored(r.reason, 'magenta')
+
+	if settings['common']['debug']:
+		print ''
 
 	# Special alerts for twitter system
 	for cap in capcodes:
@@ -59,22 +92,23 @@ def process(settings, msgobject):
 		if msgobject['prio'] == 1:
 			disc = getDiscipline(settings, capinfo)
 			did = disc['id']
-			
-			if did == 2: icon = pol
-			elif did == 3: icon = brw
-			elif did == 4: icon = ambu
-			elif did == 5: icon = heli
-			elif did == 6 or did == 7 or did == 8: icon = boat
-			else: icon = pager
 
-			msg = "{0} #{1} #{2} {3} {4}".format(
-				red, 
-				trigger.replace(" ", ""), 
-				disc['name'].replace(" ", ""),
-				icon,
-				message
-			)
-			sendTweet(settings, msg, user="JKCTech")
+			ok = [2,3,5,6,7,8]
+			if did in ok:
+				if did == 2: icon = pol
+				elif did == 3: icon = brw
+				elif did == 5: icon = heli
+				elif did == 6 or did == 7 or did == 8: icon = boat
+				else: icon = pager
+
+				msg = "{0} #{1} #{2} {3} {4}".format(
+					red, 
+					trigger.replace(" ", ""), 
+					disc['name'].replace(" ", ""),
+					icon,
+					message
+				)
+				sendTweet(settings, msg, user="JKCTech")
 
 		# Volume control on schedule
 		vol = 1
