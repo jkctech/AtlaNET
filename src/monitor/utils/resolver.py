@@ -49,7 +49,7 @@ def printCapInfo(settings, capinfo, capcodes):
 				infos.append(str(capinfo[capcode]['description']).encode('utf-8'))
 		if len(infos) == 0:
 			infos.append("Onbekend")
-		print " | ".join(infos)
+		print str(" | ".join(infos))
 
 def printMessage(line, prio):
 	timestamp = line[6:25]
@@ -70,7 +70,7 @@ def printMessage(line, prio):
 	utc = utc.replace(tzinfo=tz.tzutc())
 	local = utc.astimezone(tz.tzlocal())
 	local = local.strftime("%d-%m-%Y %H:%M:%S")
-
+	
 	print "\n", colored(local,'blue', attrs=['bold']), colored(message, color,  attrs=['bold'])
 
 
@@ -80,7 +80,7 @@ def enumToDiscipline(settings, discipline):
 
 def getDiscipline(settings, capinfo):
 	result = []
-	order = [10, 9, 5, 6, 7, 8, 13, 2, 3, 4, 11, 14, 12, 1]
+	order = [10, 9, 5, 6, 7, 8, 13, 12, 2, 3, 4, 11, 14, 1]
 	for cap in capinfo:
 		if capinfo[cap]['discipline']:
 			result.append(capinfo[cap]['discipline'])

@@ -28,8 +28,11 @@ from utils.logger import *
 from utils.alerter import *
 from utils.filter import *
 from utils.resolver import *
-from utils.twitter_utils import *
 from utils.processor import *
+
+# Set proper encoding
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 # Print header design
 printheader()
@@ -162,12 +165,6 @@ try:
 # Keyboard Interrupt (Ctrl + C)
 except KeyboardInterrupt:
 	print colored('\nTerminated by user.', 'red')
-
-# Catch crashes
-except (Exception) as e:
-	alert(settings, "Monitor crash")
-	print colored('\nException:', 'red')
-	print e
 
 # Cleanup
 finally:

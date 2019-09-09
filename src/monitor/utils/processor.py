@@ -114,6 +114,6 @@ def process(settings, msgobject):
 		vol = 1
 		now = datetime.now()
 		if now.hour >= 22 or now.hour <= 8:
-			vol = 0.5
+			vol = 0.35
 		# Send alert
 		alert(settings, message, volume=vol)
