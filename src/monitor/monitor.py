@@ -95,7 +95,7 @@ print colored("Watching...", 'cyan')
 try:
 	# We wanna run another cycle?
     while True:
-		time.sleep(0.001) # Add a sleep so we don't burn our CPU (oops)
+		time.sleep(0.0001) # Add a sleep so we don't burn our CPU (oops)
 		line = '' # Store the received line
 
 		# Check accessibility of the radio
