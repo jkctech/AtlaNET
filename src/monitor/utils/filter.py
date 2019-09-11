@@ -25,7 +25,7 @@ def getPrio(msg):
 			return i + 9
 	
 	# Tests
-	if re.search("^test|^proefalarm|^The quick brown fox jumps", msg, re.IGNORECASE):
+	if re.search("(^|pager)test|^proefalarm|^The quick brown fox jumps", msg, re.IGNORECASE):
 		return 5
 
 	return 0

@@ -5,8 +5,9 @@
 		"rawdatefiles": true,
 		"rawpath": "/../logs/raw/",
 		"saverawunique": false,
-		"uniquedatefiles": true,
 		"uniquepath": "/../logs/unique/",
+		"uniquedatefiles": true,
+		"errorpath": "/../logs/errors/",
 		"onerror": "",
 		"alertonerror": false
 	},

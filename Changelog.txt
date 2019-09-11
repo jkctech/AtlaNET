@@ -1,3 +1,10 @@
+11-09-2019
+ - "Fixed"? bug where some messages are lost due to the main loop delay
+   ^ Subject actively watched for next week to confirm a "fix"
+ - Added an error logger function
+ - Changed around some strings
+ - Note: For the 2 people actually reading this repo, Processor & Twitter utils are planned to be moved to webserver instead of local client.
+
 08-09-2019
  - This time I REALLY fixed issue #1 by rewriting the radio logic
  - Removed crash catcher because it's annoying me

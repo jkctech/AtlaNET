@@ -33,11 +33,11 @@ red = u'\U0001F534'.encode('utf-8')
 
 specials = {
 	# Heli's
-	"0120901" : red + " #Traumateam #lfl01 #LifeLiner1 " + heli,
-	"1420059" : red + " #Traumateam #lfl02 #LifeLiner2 " + heli,
-	"0923993" : red + " #Traumateam #lfl03 #LifeLiner3 " + heli,
-	"0320591" : red + " #Traumateam #medic01 #Waddenheli " + heli,
-	"0320592" : red + " #Traumateam #medic02 #Waddenheli " + heli,
+	"0120901" : red + " #TraumaHeli #LFL01 #LifeLiner1 " + heli,
+	"1420059" : red + " #TraumaHeli #LFL02 #LifeLiner2 " + heli,
+	"0923993" : red + " #TraumaHeli #LFL03 #LifeLiner3 " + heli,
+	"0320591" : red + " #Waddenheli #Medic01 " + heli,
+	"0320592" : red + " #Waddenheli #Medic01 " + heli,
 	"1220009" : red + " #Traumateam #MMT " + ambu,
 
 	# Sigma
@@ -64,6 +64,7 @@ def process(settings, msgobject):
 			'capcodes': ','.join(capcodes)
 		})
 	except (Exception) as e:
+		logError(settings, "Could not reach endpoint: " + e)
 		if settings['common']['debug']:
 			print colored('FAILED!', 'red'),
 			print colored('Could not reach endpoint.', 'magenta')
@@ -89,26 +90,25 @@ def process(settings, msgobject):
 	trigger = hasTrigger(settings, capcodes, message)
 	if trigger:
 		# Send high prio tweets to private Twitter
-		if msgobject['prio'] == 1:
-			disc = getDiscipline(settings, capinfo)
-			did = disc['id']
+		disc = getDiscipline(settings, capinfo)
+		did = disc['id']
 
-			ok = [2,3,5,6,7,8]
-			if did in ok:
-				if did == 2: icon = pol
-				elif did == 3: icon = brw
-				elif did == 5: icon = heli
-				elif did == 6 or did == 7 or did == 8: icon = boat
-				else: icon = pager
+		ok = [2,3,5,6,7,8]
+		if did in ok:
+			if did == 2: icon = pol
+			elif did == 3: icon = brw
+			elif did == 5: icon = heli
+			elif did == 6 or did == 7 or did == 8: icon = boat
+			else: icon = pager
 
-				msg = "{0} #{1} #{2} {3} {4}".format(
-					red, 
-					trigger.replace(" ", ""), 
-					disc['name'].replace(" ", ""),
-					icon,
-					message
-				)
-				sendTweet(settings, msg, user="JKCTech")
+			msg = "{0} #{1} #{2} {3} {4}".format(
+				red, 
+				trigger.replace(" ", ""), 
+				disc['name'].replace(" ", ""),
+				icon,
+				message
+			)
+			sendTweet(settings, msg, user="JKCTech")
 
 		# Volume control on schedule
 		vol = 1

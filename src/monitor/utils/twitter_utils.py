@@ -11,6 +11,7 @@
 
 import sys
 from twitter import *
+from utils.logger import *
 
 def sendTweet(settings, message, user = "AtlaNET_P2000"):
 	twuser = settings['twitter'][user]
@@ -23,5 +24,5 @@ def sendTweet(settings, message, user = "AtlaNET_P2000"):
 		status = t.statuses.update(status=message)
 	except (Exception) as e:
 		print e
-		sys.exit()
+		logError(settings, e)
 	return status

@@ -22,6 +22,7 @@ def getCapInfo(settings, capcodes):
 			'capcodes': ','.join(capcodes)
 		})
 	except (Exception) as e:
+		logError(settings, "Cap resolve error: " + e)
 		print colored('Capcode Database:', 'cyan'), colored('FAILED!', 'red'),
 		print colored('Could not reach endpoint.', 'magenta')
 		print colored(e, 'white')
@@ -80,7 +81,7 @@ def enumToDiscipline(settings, discipline):
 
 def getDiscipline(settings, capinfo):
 	result = []
-	order = [10, 9, 5, 6, 7, 8, 13, 12, 2, 3, 4, 11, 14, 1]
+	order = [10, 9, 5, 6, 7, 8, 13, 12, 3, 2, 4, 11, 14, 1]
 	for cap in capinfo:
 		if capinfo[cap]['discipline']:
 			result.append(capinfo[cap]['discipline'])
