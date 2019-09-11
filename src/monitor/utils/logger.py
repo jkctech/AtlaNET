@@ -10,7 +10,8 @@
 #
 
 import os
-from datetime import date
+from datetime import date, datetime
+from time import strftime
 
 # Save a message to a raw file
 def saveraw(message, settings):
@@ -41,3 +42,14 @@ def saverawunique(message, settings):
 			with open(path + filename, 'w'): pass
 		with open(os.path.abspath(path + filename), 'a') as file:
 			file.write(message)
+		
+def logError(settings, message):
+		filename = "errors.txt"
+		time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+		path = os.path.dirname(__file__) + settings['common']['errorpath']
+		if not os.path.exists(path):
+			os.makedirs(path)
+		if not os.path.isfile(path + filename):
+			with open(path + filename, 'w'): pass
+		with open(os.path.abspath(path + filename), 'a') as file:
+			file.write("[{0}] {1}".format(time, message))
