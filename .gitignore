@@ -1,7 +1,8 @@
-.vscode*
+.vscode/
 *.pyc
-testdata*
+testdata/
 test*
 cache*
 ~$*
 clean.sh
+AtlaNode/

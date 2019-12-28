@@ -15,6 +15,7 @@ from utils.logger import *
 
 def sendTweet(settings, message, user = "AtlaNET_P2000"):
 	twuser = settings['twitter'][user]
+	status = False
 	t = Twitter(auth=OAuth(
 		twuser['user_key'],
 		twuser['user_secret'],
