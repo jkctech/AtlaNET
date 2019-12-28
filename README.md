@@ -3,7 +3,7 @@
 ### About
 AtlaNet is a network of systems working together to retrieve, store and provide P2000 alerts.\
 \
-![Example](http://atlanet.jkctech.nl/images/screenshots/github.png)
+![Example](https://112centraal.nl/images/screenshots/github.png)
 
 ### Honorable Mentions
  - [1 FLEX Radio Tutorial | Richard IJzermans](https://raspberrytips.nl/p2000-meldingen-ontvangen/)

@@ -36,4 +36,4 @@ def isRevoke(msg):
 
 # Is this a contact request?
 def isContact(msg):
-	return bool(re.search("contact", msg, re.IGNORECASE))
+	return bool(re.search("conta(c|k)t", msg, re.IGNORECASE))

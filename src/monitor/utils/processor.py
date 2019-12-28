@@ -64,7 +64,7 @@ def process(settings, msgobject):
 			'capcodes': ','.join(capcodes)
 		})
 	except (Exception) as e:
-		logError(settings, "Could not reach endpoint: " + e)
+		logError(settings, "Could not reach endpoint:" + str(e))
 		if settings['common']['debug']:
 			print colored('FAILED!', 'red'),
 			print colored('Could not reach endpoint.', 'magenta')
@@ -88,18 +88,13 @@ def process(settings, msgobject):
 
 	# Check for keywords and capcodes on local alarm
 	trigger = hasTrigger(settings, capcodes, message)
-	if trigger:
+	if trigger and capinfo:
 		# Send high prio tweets to private Twitter
 		disc = getDiscipline(settings, capinfo)
 		did = disc['id']
 
-		ok = [2,3,5,6,7,8]
-		if did in ok:
-			if did == 2: icon = pol
-			elif did == 3: icon = brw
-			elif did == 5: icon = heli
-			elif did == 6 or did == 7 or did == 8: icon = boat
-			else: icon = pager
+		if did == 5:
+			icon = heli
 
 			msg = "{0} #{1} #{2} {3} {4}".format(
 				red, 

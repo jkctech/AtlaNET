@@ -95,7 +95,7 @@ print colored("Watching...", 'cyan')
 try:
 	# We wanna run another cycle?
     while True:
-		time.sleep(0.0001) # Add a sleep so we don't burn our CPU (oops)
+		time.sleep(0.000001) # Add a sleep so we don't burn our CPU (oops)
 		line = '' # Store the received line
 
 		# Check accessibility of the radio
@@ -107,7 +107,7 @@ try:
 		try:
 			line = multimon_ng.stdout.readline()
 			saveraw(line, settings)
-			if line.__contains__("ALN") and line.startswith('FLEX'):
+			if line.__contains__("ALN") and line.startswith("FLEX"):
 				queue.append(line)
 				lastread = time.time()
 		
